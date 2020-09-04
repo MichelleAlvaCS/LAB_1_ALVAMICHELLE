@@ -14,32 +14,24 @@ struct InventoryStruct {
 
 };
 
-
-bool CheckData(InventoryStruct *passedStruct);
+bool ReadFile(InventoryStruct tempStorage[]);
 
 int main() {
-	int inventorySize = 0; 
-
 
 	InventoryStruct invStorage[10];
-	InventoryStruct tempStorage[10];
+	InventoryStruct tempStorage[11];
 
-	tempStorage[0].itemQuantity = 89;
-
-	CheckData(tempStorage);
+	ReadFile(tempStorage);
 
 	cout << tempStorage[0].itemId << " " << tempStorage[0].itemName << " " << tempStorage[0].itemQuantity << " " << tempStorage[0].itemPrice << endl;
-
 
 	system("pause");
 	return 0;
 }
 
-
-
-bool CheckData(InventoryStruct tempStorage[]) {
-	int inventorySize = 0;
-	int valueCheck = 1;
+bool ReadFile(InventoryStruct tempStorage[]) {
+	int inventoryCounter = 0;
+	int storageSize = 10; 
 
 	//opens file
 	ifstream fin;
@@ -47,50 +39,24 @@ bool CheckData(InventoryStruct tempStorage[]) {
 
 	if (!fin) {
 		cout << "Error in opening file" << endl;
-		return 0;
-	}
-
-	//reads file and stores into temp struct
-	while (!fin.eof()) {
-
-		for (int i = 0; i < 10; i++) {
-
-			fin >> tempStorage[i].itemId;
-			fin >> tempStorage[i].itemName;
-			fin >> tempStorage[i].itemQuantity;
-			fin >> tempStorage[i].itemPrice;
-
-
-
-			inventorySize++;
-
-			//error checks part 1
-
-			while (! (fin >> tempStorage[i].itemQuantity)) {
-				cout << "ERROR: itemQuantity not entered correctly. " << endl;
-				return 1;
-			}
-
-	/*		if ((fin >> tempStorage[i].itemPrice)) {
-				cout << "ERROR: itemPrice not entered correctly. " << endl;
-				return 1;
-			}*/
-
-
-
-		}
-	}
-
-    //error checks part 2
-	if (inventorySize > 10) {
-		cout << "WARNING: File size exceeded storage capability. Only first ten items stored." << endl;
-		return 0;
-	}
-	else if (inventorySize == 0) {
-		cout << "ERROR: No inventory items found << endl;" << endl;
 		return 1;
 	}
 
+	//reads file and stores into temp struct
+	while (!fin.eof() && (inventoryCounter <= storageSize)) {
+
+			fin >> tempStorage[inventoryCounter].itemId;
+			fin >> tempStorage[inventoryCounter].itemName;
+			fin >> tempStorage[inventoryCounter].itemQuantity;
+			fin >> tempStorage[inventoryCounter].itemPrice;
+
+			if (!fin.eof())
+			inventoryCounter++;
+		}
+
+
+
+	cout << "Inventory Size: " << inventoryCounter << endl;
+
 	return 0;
 }
-
