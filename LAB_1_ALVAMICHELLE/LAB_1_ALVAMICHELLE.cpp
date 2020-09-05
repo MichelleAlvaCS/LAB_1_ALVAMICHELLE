@@ -25,10 +25,13 @@ int main() {
 	iCounter = ReadFile(tempStorage, 10);
 	cout << "FLag: " << iCounter << endl;
 
-	CheckData(tempStorage, 10, iCounter);
-
+	//CheckData(tempStorage, 10, iCounter);
+	
+	cout << "------------------------------------------------------------------" << endl;
 	cout << tempStorage[0].itemId << " " << tempStorage[0].itemName << " " << tempStorage[0].itemQuantity << " " << tempStorage[0].itemPrice << endl;
-
+	cout << tempStorage[1].itemId << " " << tempStorage[1].itemName << " " << tempStorage[1].itemQuantity << " " << tempStorage[1].itemPrice << endl;
+	cout << tempStorage[2].itemId << " " << tempStorage[2].itemName << " " << tempStorage[2].itemQuantity << " " << tempStorage[2].itemPrice << endl;
+	cout << "------------------------------------------------------------------" << endl;
 	system("pause");
 	return 0;
 }
@@ -48,18 +51,38 @@ int ReadFile(InventoryStruct tempStorage[], int size) {
 	}
 
 	//reads file and stores into temp struct
-	while (!fin.eof() && (inventoryCounter <= storageSize)) {
+	while ((!fin.eof()) && (inventoryCounter <= storageSize) && (inventoryCounter !=-1)) {
 
 			fin >> tempStorage[inventoryCounter].itemId;
 			fin >> tempStorage[inventoryCounter].itemName;
-			fin >> tempStorage[inventoryCounter].itemQuantity;
-			fin >> tempStorage[inventoryCounter].itemPrice;
+	
 
-			if (!fin.eof())
+		 if (!(fin >> tempStorage[inventoryCounter].itemQuantity)) {
+			fin.clear();
+			fin.ignore(200, '\n');
+			cout << "Item Quantity Error" << endl;
+			cout << "InventoryCounter" << inventoryCounter << endl;
+			inventoryCounter = -1;
+		}
+
+		if (!(fin >> tempStorage[inventoryCounter].itemPrice)) {
+			fin.clear();
+			fin.ignore(200, '\n');
+			cout << "Item Price Error" << endl;
+			inventoryCounter = -1;
+		}
+
+		if (!fin.eof() && (inventoryCounter != -1)) {
 			inventoryCounter++;
 		}
+	}
+
+	if (inventoryCounter != -1)
+		inventoryCounter++;
+
 	return inventoryCounter;
 }
+
 
 //Returns a 1 if an error is discovered in the file. Returns 0 if no errors found.
 bool CheckData(InventoryStruct tempStorage[], int size, int iCounter) {
@@ -67,17 +90,23 @@ bool CheckData(InventoryStruct tempStorage[], int size, int iCounter) {
 
 	if (iCounter == 0) {
 		cout << "Error: File is empty" << endl;
-		errorFlag = 1;
+		errorFlag = -2;
 	}
 	if (iCounter == 11) {
 		cout << "Error: File is too big" << endl;
-		errorFlag = 1;
+		errorFlag = -2;
 	}
-
-
-	// WORKING ON ERROR CHECKING IDCOUNTER AND ITEMPRICE****************************************************************
-
 	return 0;
 }
 
 
+/*
+		if ((!fin.eof()) && inventoryCounter == 0) {
+			cout << "Error: File is empty" << endl;
+			inventoryCounter = -1;
+		}*/
+
+		//else if (!fin.eof() && inventoryCounter != 11) {
+		//	cout << "Error: File is too big" << endl;
+		//	inventoryCounter = -1;
+		//}
