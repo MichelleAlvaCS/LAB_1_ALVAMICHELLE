@@ -15,7 +15,6 @@ struct InventoryStruct {
 };
 
 int ReadFile(InventoryStruct tempArray[], int size);
-bool CheckData(InventoryStruct tempStorage[], int size, int iCounter);
 
 int main() {
 	int iCounter = 0;
@@ -25,9 +24,8 @@ int main() {
 	iCounter = ReadFile(tempStorage, 10);
 	cout << "FLag: " << iCounter << endl;
 
-	//CheckData(tempStorage, 10, iCounter);
-	
 	cout << "------------------------------------------------------------------" << endl;
+
 	cout << tempStorage[0].itemId << " " << tempStorage[0].itemName << " " << tempStorage[0].itemQuantity << " " << tempStorage[0].itemPrice << endl;
 	cout << tempStorage[1].itemId << " " << tempStorage[1].itemName << " " << tempStorage[1].itemQuantity << " " << tempStorage[1].itemPrice << endl;
 	cout << tempStorage[2].itemId << " " << tempStorage[2].itemName << " " << tempStorage[2].itemQuantity << " " << tempStorage[2].itemPrice << endl;
@@ -36,11 +34,17 @@ int main() {
 	return 0;
 }
 
-//Returns file inventory amount if file is read correctly. Returns -1 if file not read
+//Returns 0 if file is read correctly. Returns -1 if file not read
 int ReadFile(InventoryStruct tempStorage[], int size) {
 	int inventoryCounter = 0;
-	int storageSize = 10; 
-
+	int storageSize = 10;
+	string id;
+	string name;
+	int quantity;
+	double price;
+	int index = 0;
+	int placeHolder = 0;
+	
 	//opens file
 	ifstream fin;
 	fin.open("Inventory.txt");
@@ -50,63 +54,47 @@ int ReadFile(InventoryStruct tempStorage[], int size) {
 		return -1;
 	}
 
-	//reads file and stores into temp struct
-	while ((!fin.eof()) && (inventoryCounter <= storageSize) && (inventoryCounter !=-1)) {
+	//Reads file 
+	while ((fin >> id >> name >> quantity >> price) && inventoryCounter!=-1) {
+		inventoryCounter++;		
+	}
+	placeHolder = inventoryCounter;
 
-			fin >> tempStorage[inventoryCounter].itemId;
-			fin >> tempStorage[inventoryCounter].itemName;
-	
-
-		 if (!(fin >> tempStorage[inventoryCounter].itemQuantity)) {
-			fin.clear();
-			fin.ignore(200, '\n');
-			cout << "Item Quantity Error" << endl;
-			cout << "InventoryCounter" << inventoryCounter << endl;
-			inventoryCounter = -1;
-		}
-
-		if (!(fin >> tempStorage[inventoryCounter].itemPrice)) {
-			fin.clear();
-			fin.ignore(200, '\n');
-			cout << "Item Price Error" << endl;
-			inventoryCounter = -1;
-		}
-
-		if (!fin.eof() && (inventoryCounter != -1)) {
-			inventoryCounter++;
-		}
+	if (inventoryCounter <= 0) {
+		cout << "File empty or Corrupt" << endl;
+		inventoryCounter = -1;
 	}
 
-	if (inventoryCounter != -1)
-		inventoryCounter++;
+	else if (inventoryCounter >= 11) {
+		cout << "Too many entries" << endl;
+		inventoryCounter = -1;
+	}
+
+	else {
+		fin.clear();
+		fin.seekg(0, ios::beg);
+
+		while(index <= (placeHolder-1)) {
+			
+			fin >> tempStorage[index].itemId;
+			fin >> tempStorage[index].itemName;
+			if (!(fin >> tempStorage[index].itemQuantity)) {
+				cout << "ItemQuantity Error" << endl;
+				inventoryCounter = -1;
+			}
+
+			if (!(fin >> tempStorage[index].itemPrice)) {
+				cout << "ItemPrice Error" << endl;
+				inventoryCounter = -1;
+			}
+
+			index++;
+
+		}
+	}
 
 	return inventoryCounter;
 }
 
 
-//Returns a 1 if an error is discovered in the file. Returns 0 if no errors found.
-bool CheckData(InventoryStruct tempStorage[], int size, int iCounter) {
-	int errorFlag = 0;
 
-	if (iCounter == 0) {
-		cout << "Error: File is empty" << endl;
-		errorFlag = -2;
-	}
-	if (iCounter == 11) {
-		cout << "Error: File is too big" << endl;
-		errorFlag = -2;
-	}
-	return 0;
-}
-
-
-/*
-		if ((!fin.eof()) && inventoryCounter == 0) {
-			cout << "Error: File is empty" << endl;
-			inventoryCounter = -1;
-		}*/
-
-		//else if (!fin.eof() && inventoryCounter != 11) {
-		//	cout << "Error: File is too big" << endl;
-		//	inventoryCounter = -1;
-		//}
